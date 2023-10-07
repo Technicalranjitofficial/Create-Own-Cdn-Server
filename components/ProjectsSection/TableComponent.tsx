@@ -18,7 +18,7 @@ console.log(getData);
     } = JSON.parse(getData);
   return (
     <div>
-       {decode.data && <DataTableDemo data={decode.data} />}
+       {decode.data && <DataTableDemo folder={params.projectName} data={decode.data} />}
     </div>
   )
 }

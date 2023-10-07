@@ -6,9 +6,9 @@ import { Providers } from "./provider";
 
 const inter = Inter({ subsets: ["latin"] });
 import { AiOutlineHome } from "react-icons/ai";
-import Navbar from "@/components/Navbar";
 import SideBar from "@/components/SideBar";
 import NavBar2 from "@/components/NavBar2";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,20 +26,18 @@ export default function RootLayout({
         <Providers>
           <div className="w-screen h-screen">
             <div className="h-full  mx-auto w-full flex flex-row  bg-[#101418]">
-           <div className="hidden lg:block">
-           <SideBar/>
-           </div>
-             
+           
               {/* <!-- Main Content --> */}
               <div className="w-full bg-[#101418] ">
                 <NavBar2/>
-                <div className="overflow-auto h-screen">
+                <div className="overflow-auto md:px-10 lg:px-20 h-screen">
                 {children}
 
                 </div>
                 </div>
             </div>
           </div>
+          <Toaster />
         </Providers>
       </body>
     </html>

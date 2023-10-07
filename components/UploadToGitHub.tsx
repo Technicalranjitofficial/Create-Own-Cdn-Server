@@ -1,5 +1,5 @@
 "use client"
-import { UploadFilesToGithub, uploadFiles } from '@/serverActions/files'
+import { UploadFilesToGithub } from '@/serverActions/files'
 import Image from 'next/image'
 import { FC } from 'react'
 import { Interface } from 'readline'

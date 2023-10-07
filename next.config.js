@@ -2,7 +2,9 @@
 const nextConfig = {
     experimental:{
         serverActions:true,
-        serverActionsBodySizeLimit: '10mb'
+        serverActionsBodySizeLimit: '10mb',
+        
+        
     },
     
     images:{

@@ -13,68 +13,6 @@ import { cache } from "react";
 let token =
   "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";
 
-export const uploadFiles = async (
-  data: string,
-  imageName: string,
-  userId: string
-) => {
-  try {
-    await connectDB();
-    //checking user exist
-    if (!userId) {
-      return JSON.stringify({ message: "User not found", success: false });
-    }
-    const user = await User.findById(userId);
-    if (!user) {
-      return JSON.stringify({ message: "User not found", success: false });
-    }
-
-    //upload image to github
-    const url =
-      "https://api.github.com/repos/ranjitdasofficial/api-testing/contents/images/" +
-      imageName;
-    const datas = {
-      message: "upload image",
-      content: data,
-    };
-    const headers = {
-      Authorization: "token " + token,
-    };
-    const response = await axios.put(url, datas, { headers });
-    console.log(response.data.content.download_url);
-    // return response.data.content.download_url;
-    console.log(response.data.content);
-    uploadToMongo(
-      response.data.content.download_url,
-      imageName,
-      response.data.content.size,
-      userId
-    );
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const uploadToMongo = async (
-  url: string,
-  imageName: string,
-  size: number,
-  userId: string
-) => {
-  try {
-    const data = {
-      Url: url,
-      name: imageName,
-      size: size,
-      Uploader: userId,
-    };
-    const upload = await FileModel.create(data);
-    console.log(upload);
-    // console.log(response.data);
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 export const getAllFiles = async (userId: string) => {
   try {
@@ -130,32 +68,66 @@ export const getAllGithubRepos = async (AccessTone: string) => {
 // }
 
 //check if the repos exist or not
-const checkReposExist = async (
-  reposName: string,
+// const checkReposExist = async (
+//   reposName: string,
+//   AccessToken: string,
+//   username: string
+// ) => {
+//   try {
+//     // Check if the repository exists by making a GET request
+//     const response = await axios.get(
+//       `https://api.github.com/repos/${username}/${reposName}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${AccessToken}`,
+//         },
+//       }
+//     );
+
+//     // If the repository exists, log a message and return
+//     console.log("Repository already exists:", response.data);
+//     return { success: true, data: response.data };
+//   } catch (error: any) {
+//     if (error.response && error.response.status === 404) {
+//       // If the response status is 404, the repository does not exist, so create it
+//       return {success:false};
+//     }
+//   }
+// };
+
+export const checkExist = cache( async (
   AccessToken: string,
+  repoName: string,
   username: string
 ) => {
   try {
-    // Check if the repository exists by making a GET request
-    const response = await axios.get(
-      `https://api.github.com/repos/${username}/${reposName}`,
-      {
-        headers: {
-          Authorization: `Bearer ${AccessToken}`,
-        },
-      }
-    );
+    let arr = [];
+    const url = `https://api.github.com/repos/${username}/${repoName}/contents`;
+    const headers = {
+      Authorization: "token " + AccessToken,
+    };
+    const response = await axios.get(url, { headers }) ;
 
-    // If the repository exists, log a message and return
-    console.log("Repository already exists:", response.data);
-    return true;
-  } catch (error: any) {
-    if (error.response && error.response.status === 404) {
-      // If the response status is 404, the repository does not exist, so create it
-      return false;
+    for (let index = 0; index < response.data.length; index++) {
+        const element:IRequestFiles = response.data[index];
+        if(element.type=="dir"){
+            arr.push(element as IRequestFiles);
+        }  
     }
+
+    
+
+    return {
+      message: "Files found",
+      success: true,
+      data: arr as IRequestFiles[],
+    }
+  } catch (error: any) {
+    console.log(error);
+    return {success:false,}
   }
-};
+});
+
 
 export const initializeBaseRepos = async (
   AccessToken: string,
@@ -163,11 +135,13 @@ export const initializeBaseRepos = async (
   username: string
 ) => {
   try {
-    if (await checkReposExist(repoName, AccessToken, username)) {
-      console.log("yes");
-      return JSON.stringify({
-        message: "Repository already exists",
-        success: false,
+    const d = await  checkExist(AccessToken,repoName, username);
+
+    if (d?.success) {
+     return JSON.stringify({
+        message: "Base Directory Exist",
+        success: true,
+        data: d.data as IRequestFiles[],
       });
     }
 
@@ -175,7 +149,6 @@ export const initializeBaseRepos = async (
       name: repoName, // Change this to the desired repo name
       // Set to true for a private repo, false for public
     };
-
     const response = await axios.post(
       "https://api.github.com/user/repos",
       repoData,
@@ -195,20 +168,20 @@ export const initializeBaseRepos = async (
     });
   } catch (error: any) {
     console.log(error);
-    return showError(error.message, false);
+    return showError("Failed to Initialize the base Directory", false);
   }
 };
 
 //upload files to github
 export const UploadFilesToGithub = async (
   AccessToken: string,
-  repoName: string,
+  folderName: string,
   username: string,
   fileName: string,
   fileData: string
 ) => {
   try {
-    const url = `https://api.github.com/repos/${username}/${repoName}/contents/surya/${fileName}`;
+    const url = `https://api.github.com/repos/${username}/rdserver/contents/${folderName}/${fileName}`;
     const datas = {
       message: "upload image",
       content: fileData,
@@ -246,6 +219,7 @@ export const createDirectory = async (
   directoryPath: string
 ) => {
   try {
+    console.log(accessToken, repoName, repoOwner, directoryPath);
     // Create a new file in the empty directory (this will force GitHub to create the directory)
     const createFileResponse = await axios.put(
       `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${directoryPath}/.gitkeep`,
@@ -259,54 +233,25 @@ export const createDirectory = async (
         },
       }
     );
+    if(!createFileResponse.data.content){
+        return false;
+    }
 
     console.log("Empty directory created successfully.");
 
-    return createFileResponse.data;
+    return true;
   } catch (error: any) {
     console.error(
       "Error creating empty directory:",
       error.response?.data || error.message
     );
-    return null;
+    return false;
   }
 };
 
 
 // export const revalidate = 3600 // revalidate the data at most every hour
 // get all files from github by name
-export const getAllFilesFromGithub = cache( async (
-  AccessToken: string,
-  repoName: string,
-  username: string
-) => {
-  try {
-    let arr = [];
-    const url = `https://api.github.com/repos/${username}/${repoName}/contents`;
-    const headers = {
-      Authorization: "token " + AccessToken,
-    };
-    const response = await axios.get(url, { headers }) ;
-
-    for (let index = 0; index < response.data.length; index++) {
-        const element:IRequestFiles = response.data[index];
-        if(element.type=="dir"){
-            arr.push(element as IRequestFiles);
-        }  
-    }
-
-    
-
-    return JSON.stringify({
-      message: "Files found",
-      success: true,
-      data: arr as IRequestFiles[],
-    });
-  } catch (error: any) {
-    console.log(error);
-    return showError(error.message, false);
-  }
-});
 
 
 export const getFolderContent = cache(async (

@@ -1,5 +1,5 @@
 "use client"
-import { uploadFiles } from '@/serverActions/files'
+
 import Image from 'next/image'
 export default function Home() {
   const upload = (formData:FormData)=>{

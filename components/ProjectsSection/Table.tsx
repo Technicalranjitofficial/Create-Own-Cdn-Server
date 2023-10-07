@@ -15,7 +15,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import {  ChevronDown } from "lucide-react"
+import {  CalendarDays, ChevronDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
@@ -35,9 +35,14 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { IRequestFiles } from "@/interfaces/files"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import Image from "next/image"
+import UploadFiles from "../UploadFile"
+import { UploadFilesData } from "../UploadFiles"
 
 
-export function DataTableDemo({data}:{data:IRequestFiles[]}) {
+export function DataTableDemo({data,folder}:{data:IRequestFiles[],folder:string}) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -66,23 +71,27 @@ export function DataTableDemo({data}:{data:IRequestFiles[]}) {
   })
 
   return (
-    <div className="w-full text-white px-5">
-      <div className="flex items-center bg-transparent py-4">
+    <div className="w-full text-white px-5 pb-28">
+        {/* <Button className="">Upload New Files</Button> */}
+        <UploadFilesData folder={folder}  />
+      <div className="flex items-center bg-transparent  py-4">
         <Input
-          placeholder="Filter emails... "
+          placeholder="Filter files... "
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm bg-transparent text-white placeholder-white"
         />
+
+      
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto bg-transparent ">
               Columns <ChevronDown className="ml-2 h-4 w-4 bg-transparent" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent className="bg-body text-slate-200" align="end">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
@@ -126,20 +135,30 @@ export function DataTableDemo({data}:{data:IRequestFiles[]}) {
           <TableBody >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
+
                 <TableRow
                 className="hover:bg-gray-900"
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
+
                   {row.getVisibleCells().map((cell) => (
+                    
+
+
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </TableCell>
+
+
+
+                  
                   ))}
                 </TableRow>
+              
               ))
             ) : (
               <TableRow>

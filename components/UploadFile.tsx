@@ -1,5 +1,5 @@
 "use client"
-import { uploadFiles } from '@/serverActions/files'
+
 import Image from 'next/image'
 export default function UploadFiles({userId}:{userId:string}) {
   const upload = (formData:FormData)=>{
@@ -17,7 +17,6 @@ export default function UploadFiles({userId}:{userId:string}) {
     reader.onload = function () {
       const base64Data = reader.result?.toString().split(',')[1]
       
-      uploadFiles(base64Data as string,fileName,userId);
     };
 
   }
