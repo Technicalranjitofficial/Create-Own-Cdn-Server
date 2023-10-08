@@ -120,8 +120,9 @@ function NavBar2() {
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+          <Link href="/">
           <Typography
-            variant="h5"
+            variant="h6"
             noWrap
             component="a"
             href="#app-bar-with-responsive-menu"
@@ -131,13 +132,14 @@ function NavBar2() {
               flexGrow: 1,
               fontFamily: "monospace",
               fontWeight: 700,
-              letterSpacing: ".3rem",
+              letterSpacing: ".1rem",
               color: "inherit",
               textDecoration: "none",
             }}
           >
-            LOGO
+            CDN-SERVER
           </Typography>
+          </Link>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => {
               return page === "New Folder" ? (

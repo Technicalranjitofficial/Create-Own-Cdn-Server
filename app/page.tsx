@@ -26,7 +26,7 @@ export default async function Home() {
    <MainLayout title='Its Ready' subTitle='Now You can create folders and inside files' img='https://raw.githubusercontent.com/Technicalranjitofficial/rdserver/main/CDN-SERVER/1696744621479_Screenshot%20from%202023-10-08%2011-25-31.png' />
      {/* creating a note   */}
 
-     <h1 className='pb-28 p-3 text-center text-red-700'>Note : <span className='text-slate-300'> Don&apos;t delete <span className='text-red-500'>rdserver</span> folder from your repository otherwise all your files will be deleted. </span> </h1>
+     <h1 className='pb-36 p-3 text-center text-red-700'>Note : <span className='text-slate-300'> Don&apos;t delete <span className='text-red-500'>rdserver</span> folder from your repository otherwise all your files will be deleted. </span> </h1>
   </>
 
   )
