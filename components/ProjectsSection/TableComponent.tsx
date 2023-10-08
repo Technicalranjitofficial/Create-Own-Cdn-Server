@@ -11,7 +11,7 @@ const TableComponent = async({params}:{params:any}) => {
     if(!session){
         return <h1>Please Login</h1>;
     }
-    const getData = await getFolderContent((session as unknown as CustomSession).accessToken as string,"rdserver",session.user?.name as string,params.projectName);
+    const getData = await getFolderContent((session as unknown as CustomSession).accessToken as string,"rdserver",(session as unknown as CustomSession).login as string,params.projectName);
 console.log(getData);
     const decode:{
         data:IRequestFiles[]

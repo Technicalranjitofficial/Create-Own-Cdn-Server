@@ -65,7 +65,7 @@ export function UploadFilesData({folder}:{folder:string}) {
     reader.onload = async function () {
       const base64Data = reader.result?.toString().split(',')[1]
       
-      const upload = await UploadFilesToGithub(`${(session.data as unknown as CustomSession).accessToken}`,folder,`${session.data.user?.name}`,fileName,base64Data as string);
+      const upload = await UploadFilesToGithub(`${(session.data as unknown as CustomSession).accessToken}`,folder,`${(session.data as unknown as CustomSession).login}`,fileName,base64Data as string);
       if (upload) {
         toast({
           title: "Success!",

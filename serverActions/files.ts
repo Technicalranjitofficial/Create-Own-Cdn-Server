@@ -95,18 +95,71 @@ export const getAllGithubRepos = async (AccessTone: string) => {
 //   }
 // };
 
-export const checkExist = cache( async (
+//get accoutn info
+
+export const getAccountInfo = async (AccessToken: string) => {
+  try {
+    const config = {
+      headers: {
+        'Authorization': `token ${AccessToken}`,
+      },
+    };
+    
+    axios.get('https://api.github.com/user', config)
+      .then(response => {
+        // Handle the response, which contains the user's account information
+        const accountInfo = response.data;
+        console.log('GitHub Account Info:', accountInfo);
+
+      })
+      .catch(error => {
+        // Handle errors
+        console.error('Error:', error);
+      });
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+
+async function checkRepositoryExists(owner:string, repo:string,AccessToken:string) {
+  try {
+    const headers = {
+      Authorization: "token " + AccessToken,
+    };
+    const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}`,{headers});
+    
+
+    // If the repository exists, response.status will be 200
+    if (response.status === 200) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error:any) {
+    return false;
+  }
+}
+
+
+
+export const getReposData =  async (
   AccessToken: string,
   repoName: string,
   username: string
 ) => {
   try {
+    console.log(AccessToken,repoName,username);
     let arr = [];
     const url = `https://api.github.com/repos/${username}/${repoName}/contents`;
     const headers = {
       Authorization: "token " + AccessToken,
     };
-    const response = await axios.get(url, { headers }) ;
+
+    const response = await axios.get(url,{headers}) ;
+    console.log(response.data)
 
     for (let index = 0; index < response.data.length; index++) {
         const element:IRequestFiles = response.data[index];
@@ -124,9 +177,9 @@ export const checkExist = cache( async (
     }
   } catch (error: any) {
     console.log(error);
-    return {success:false,}
+    return {success:false,message:error.message}
   }
-});
+};
 
 
 export const initializeBaseRepos = async (
@@ -135,15 +188,39 @@ export const initializeBaseRepos = async (
   username: string
 ) => {
   try {
-    const d = await  checkExist(AccessToken,repoName, username);
+    console.log(AccessToken,repoName,username);
+    const checkEs = await checkRepositoryExists(username,repoName,AccessToken);
+    // const d = await  checkExist(AccessToken,repoName, username);
+    console.log("succe",checkEs);
 
-    if (d?.success) {
-     return JSON.stringify({
-        message: "Base Directory Exist",
-        success: true,
-        data: d.data as IRequestFiles[],
-      });
+    if(checkEs){
+      const data = await getReposData(AccessToken,repoName,username);
+
+      console.log(data);
+      if(data.success){
+        return JSON.stringify({
+          message: "Base Directory Exist",
+          success: true,
+          data: data.data as IRequestFiles[],
+        });
+      }else{
+        return  JSON.stringify({
+          message: "Create New Folder",
+          success: true,
+          data:[]
+         
+        });
+      }
     }
+
+
+    // if (d?.success) {
+    //  return JSON.stringify({
+    //     message: "Base Directory Exist",
+    //     success: true,
+    //     data: d.data as IRequestFiles[],
+    //   });
+    // }
 
     const repoData = {
       name: repoName, // Change this to the desired repo name

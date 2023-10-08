@@ -15,7 +15,7 @@ const ProjectsHeader = async() => {
   if(!session){
       return <h1>Please Login</h1>;
   }
-  const getData = await initializeBaseRepos((session as unknown as CustomSession).accessToken as string,"rdserver",session.user?.name as string);
+  const getData = await initializeBaseRepos((session as unknown as CustomSession).accessToken as string,"rdserver",(session as unknown as CustomSession).login as string);
 
   const decode:{
       data:IRequestFiles[],

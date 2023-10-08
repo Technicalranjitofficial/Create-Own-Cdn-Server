@@ -50,7 +50,7 @@ export function NewFolder({title}:{title:string}) {
   setIsCreating(true);
 
 
-    const createDir = await createDirectory(`${(session.data as unknown as CustomSession).accessToken}`,"rdserver",`${session.data.user?.name}`,`${formData.get("name")}`);
+    const createDir = await createDirectory(`${(session.data as unknown as CustomSession).accessToken}`,"rdserver",`${(session.data as unknown as CustomSession).login}`,`${formData.get("name")}`);
     console.log(createDir);
     if(createDir){
       toast({
