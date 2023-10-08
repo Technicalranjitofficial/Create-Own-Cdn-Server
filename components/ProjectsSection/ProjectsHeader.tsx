@@ -13,7 +13,7 @@ const ProjectsHeader = async() => {
   const session  = await getServerSession(authOption);
   console.log(session);
   if(!session){
-      return <h1>Please Login</h1>;
+      return <h1 className='text-center justify-center flex items-center'>Please Refresh</h1>;
   }
   const getData = await initializeBaseRepos((session as unknown as CustomSession).accessToken as string,"rdserver",(session as unknown as CustomSession).login as string);
 
